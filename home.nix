@@ -4,8 +4,8 @@
   home.stateVersion = "25.11";
 
   home.packages = with pkgs; [
-    st dmenu
-    htop curl
+    dmenu
+    htop curl bat
     fastfetch
   ];
 
@@ -13,8 +13,8 @@
 
   programs.git = {
     enable = true;
-    userName = "Wade";
-    userEmail = "wade@nixos-btw";
+    settings.user.name = "Wade";
+    settings.user.email = "wade@nixos-btw";
   };
 
   programs.bash = {
