@@ -36,6 +36,12 @@
       };
       buildInputs = (old.buildInputs or []) ++ [ final.harfbuzz final.imlib2 ];
     });
+    dmenu = prev.dmenu.overrideAttrs (old: {
+      src = final.fetchzip {
+        url = "https://github.com/sonic371/dmenu/archive/ccae9b52ec20bcb665bdaca53125bb137dcd07fa.tar.gz";
+        hash = "sha256-RXmyTYkNt8MhQadG4AVidD88HDXmtwQeQV/KbGlttGg=";
+      };
+    });
   }) ];
 
   environment.systemPackages = with pkgs; [
@@ -43,6 +49,7 @@
     wget
     xclip
     st
+    dmenu
   ];
 
   environment.variables.EDITOR = "vim";
@@ -67,6 +74,11 @@
       '';
     })
   ];
+
+  # Compatibility symlink for scripts using /bin/bash
+  system.activationScripts.binbash.text = ''
+    ln -sf ${pkgs.bash}/bin/bash /bin/bash
+  '';
 
   system.stateVersion = "25.11";
 }

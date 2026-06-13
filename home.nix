@@ -10,15 +10,22 @@ in {
   home.stateVersion = "25.11";
 
   home.packages = with pkgs; [
-    dmenu
-    curl bat
+    htop curl bat
     fastfetch
     xorg.xrdb
     dunst
     feh
+    picom
+    xdotool
+    playerctl
+    maim
+    pulsemixer
+    sxhkd
   ];
 
   programs.home-manager.enable = true;
+
+  home.sessionPath = [ "${dotfiles}/bin/.local/bin" ];
 
   programs.git = {
     enable = true;
@@ -29,9 +36,23 @@ in {
   programs.bash = {
     enable = true;
     initExtra = ''
-      export PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
       alias update='sudo nixos-rebuild switch --flake /etc/nixos#nixos-btw'
     '';
+  };
+
+  programs.starship = {
+    enable = true;
+    settings = {
+      add_newline = false;
+      character = {
+        success_symbol = "[➜](green)";
+        error_symbol = "[➜](red)";
+      };
+      nix_shell = {
+        symbol = "❄️ ";
+        format = "via [$symbol]($style) ";
+      };
+    };
   };
 
   home.file = {
@@ -40,6 +61,49 @@ in {
       exec dwm
     '';
     ".Xresources".source = "${dotfiles}/xresources/.Xresources";
+    ".config/picom/picom.conf".source = "${dotfiles}/picom/.config/picom/picom.conf";
+    ".config/scripts/sxhkd-volume.sh".source = "${dotfiles}/scripts/.config/scripts/sxhkd-volume.sh";
+    ".config/scripts/sxhkd-brightness.sh".source = "${dotfiles}/scripts/.config/scripts/sxhkd-brightness.sh";
+    ".config/scripts/sxhkd-toggle-mic.sh".source = "${dotfiles}/scripts/.config/scripts/sxhkd-toggle-mic.sh";
+    ".config/scripts/sxhkd-maim.sh".source = "${dotfiles}/scripts/.config/scripts/sxhkd-maim.sh";
+    ".config/scripts/sxhkd_record.sh".source = "${dotfiles}/scripts/.config/scripts/sxhkd_record.sh";
+    ".config/scripts/dmenu_define.sh".source = "${dotfiles}/scripts/.config/scripts/dmenu_define.sh";
+    ".config/scripts/dmenu_media.sh".source = "${dotfiles}/scripts/.config/scripts/dmenu_media.sh";
+    ".config/scripts/record-webcam.sh".source = "${dotfiles}/scripts/.config/scripts/record-webcam.sh";
+    ".config/sxhkd/sxhkdrc".source = "${dotfiles}/sxhkd/.config/sxhkd/sxhkdrc";
+  };
+
+  systemd.user.services.picom = {
+    Unit = {
+      Description = "Picom compositor";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "simple";
+      ExecStart = "${pkgs.picom}/bin/picom --backend xrender --config %h/.config/picom/picom.conf";
+      Restart = "on-failure";
+    };
+    Install = {
+      WantedBy = [ "graphical-session.target" ];
+    };
+  };
+
+  systemd.user.services.sxhkd = {
+    Unit = {
+      Description = "Simple X hotkey daemon";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "simple";
+      Environment = "PATH=${dotfiles}/bin/.local/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin";
+      ExecStart = "${pkgs.sxhkd}/bin/sxhkd -c %h/.config/sxhkd/sxhkdrc";
+      Restart = "on-failure";
+    };
+    Install = {
+      WantedBy = [ "graphical-session.target" ];
+    };
   };
 
   # User systemd services
