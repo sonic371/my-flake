@@ -5,8 +5,9 @@
 
   home.packages = with pkgs; [
     dmenu
-    htop curl bat
+    curl bat
     fastfetch
+    xorg.xrdb
   ];
 
   programs.home-manager.enable = true;
@@ -27,10 +28,13 @@
 
   home.file = {
     ".xinitrc".text = ''
+      [ -f "$HOME/.Xresources" ] && xrdb -merge "$HOME/.Xresources"
       exec dwm
     '';
-    ".Xresources".text = ''
-      Xft.dpi: 96
-    '';
+    ".Xresources".source = "${(builtins.fetchGit {
+      url = "https://github.com/sonic371/dotfiles.git";
+      rev = "88ae24141dfc0b8867c14d460a88627295278110";
+      lfs = true;
+    })}/xresources/.Xresources";
   };
 }

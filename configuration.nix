@@ -47,6 +47,28 @@
 
   environment.variables.EDITOR = "vim";
 
+  # Custom fonts from dotfiles (with git LFS support)
+  nixpkgs.config.permittedInsecurePackages = [ "git-2.45.2" ];
+  fonts.packages = with pkgs; let
+    dotfiles = builtins.fetchGit {
+      url = "https://github.com/sonic371/dotfiles.git";
+      rev = "88ae24141dfc0b8867c14d460a88627295278110";
+      lfs = true;
+    };
+    fontDir = "${dotfiles}/fonts/.local/share/fonts";
+  in [
+    noto-fonts
+    noto-fonts-cjk-sans
+    (pkgs.stdenvNoCC.mkDerivation {
+      name = "dotfiles-fonts";
+      dontUnpack = true;
+      installPhase = ''
+        mkdir -p $out/share/fonts
+        cp -r "${fontDir}/"* $out/share/fonts/
+      '';
+    })
+  ];
+
   system.stateVersion = "25.11";
 }
 
