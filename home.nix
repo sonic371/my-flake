@@ -1,6 +1,12 @@
 { config, pkgs, ... }:
 
-{
+let
+  dotfiles = builtins.fetchGit {
+    url = "https://github.com/sonic371/dotfiles.git";
+    rev = "88ae24141dfc0b8867c14d460a88627295278110";
+    lfs = true;
+  };
+in {
   home.stateVersion = "25.11";
 
   home.packages = with pkgs; [
@@ -8,6 +14,8 @@
     curl bat
     fastfetch
     xorg.xrdb
+    dunst
+    feh
   ];
 
   programs.home-manager.enable = true;
@@ -31,10 +39,67 @@
       [ -f "$HOME/.Xresources" ] && xrdb -merge "$HOME/.Xresources"
       exec dwm
     '';
-    ".Xresources".source = "${(builtins.fetchGit {
-      url = "https://github.com/sonic371/dotfiles.git";
-      rev = "88ae24141dfc0b8867c14d460a88627295278110";
-      lfs = true;
-    })}/xresources/.Xresources";
+    ".Xresources".source = "${dotfiles}/xresources/.Xresources";
+  };
+
+  # User systemd services
+  systemd.user.services.battery-alert = {
+    Unit = {
+      Description = "Battery Alert Service";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      Environment = [ "DISPLAY=:0" "PATH=${pkgs.dunst}/bin:${pkgs.coreutils}/bin:${pkgs.bash}/bin" ];
+      ExecStart = "${dotfiles}/dunst/.config/dunst/scripts/battery-alert.sh";
+    };
+    Install = {
+      WantedBy = [ "default.target" ];
+    };
+  };
+
+  systemd.user.timers.battery-alert = {
+    Unit = {
+      Description = "Run battery alert check every minute";
+      Requires = [ "battery-alert.service" ];
+    };
+    Timer = {
+      OnBootSec = "1min";
+      OnUnitActiveSec = "1min";
+      Persistent = true;
+    };
+    Install = {
+      WantedBy = [ "timers.target" ];
+    };
+  };
+
+  systemd.user.services.change-wallpaper = {
+    Unit = {
+      Description = "Change Wallpaper";
+    };
+    Service = {
+      Type = "oneshot";
+      Environment = [ "DISPLAY=:0" "PATH=${pkgs.feh}/bin:${pkgs.coreutils}/bin:${pkgs.bash}/bin" ];
+      ExecStart = "${dotfiles}/scripts/.config/scripts/wallpaper.sh";
+    };
+    Install = {
+      WantedBy = [ "default.target" ];
+    };
+  };
+
+  systemd.user.timers.change-wallpaper = {
+    Unit = {
+      Description = "Change wallpaper every minute";
+    };
+    Timer = {
+      OnBootSec = "1min";
+      OnUnitActiveSec = "1min";
+      OnStartupSec = "1min";
+      Persistent = true;
+    };
+    Install = {
+      WantedBy = [ "timers.target" ];
+    };
   };
 }

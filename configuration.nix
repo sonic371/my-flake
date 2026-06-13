@@ -48,7 +48,6 @@
   environment.variables.EDITOR = "vim";
 
   # Custom fonts from dotfiles (with git LFS support)
-  nixpkgs.config.permittedInsecurePackages = [ "git-2.45.2" ];
   fonts.packages = with pkgs; let
     dotfiles = builtins.fetchGit {
       url = "https://github.com/sonic371/dotfiles.git";
