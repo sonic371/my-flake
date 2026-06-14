@@ -1,4 +1,4 @@
-{ config, lib, pkgs, dotfiles, dwm-src, ... }:
+{ config, lib, pkgs, dotfiles, dwm-src, st-src, dmenu-src, ... }:
 
 {
   imports = [
@@ -27,20 +27,20 @@
   };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.auto-optimise-store = true;
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 7d";
+  };
 
   nixpkgs.overlays = [ (final: prev: {
     st = prev.st.overrideAttrs (old: {
-      src = final.fetchzip {
-        url = "https://github.com/sonic371/st-flexipatch/archive/5396e957352d440e343b4e6433b40f1ed7a74b83.tar.gz";
-        hash = "sha256-pe26MrVb2mGvDzCU/GzY3SsxsMO8Qw0DBQox6RhR9qA=";
-      };
+      src = st-src;
       buildInputs = (old.buildInputs or []) ++ [ final.harfbuzz final.imlib2 ];
     });
     dmenu = prev.dmenu.overrideAttrs (old: {
-      src = final.fetchzip {
-        url = "https://github.com/sonic371/dmenu/archive/ccae9b52ec20bcb665bdaca53125bb137dcd07fa.tar.gz";
-        hash = "sha256-RXmyTYkNt8MhQadG4AVidD88HDXmtwQeQV/KbGlttGg=";
-      };
+      src = dmenu-src;
     });
     dwm = prev.dwm.overrideAttrs (old: {
       src = dwm-src;

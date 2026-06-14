@@ -11,9 +11,17 @@
       url = "github:sonic371/dwm/mybuild";
       flake = false;
     };
+    st-src = {
+      url = "github:sonic371/st-flexipatch/5396e957352d440e343b4e6433b40f1ed7a74b83";
+      flake = false;
+    };
+    dmenu-src = {
+      url = "github:sonic371/dmenu/ccae9b52ec20bcb665bdaca53125bb137dcd07fa";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, dwm-src, ... }: 
+  outputs = { self, nixpkgs, home-manager, dwm-src, st-src, dmenu-src, ... }: 
     let
       dotfiles = builtins.fetchGit {
         url = "https://github.com/sonic371/dotfiles.git";
@@ -23,7 +31,7 @@
     in {
     nixosConfigurations.nixos-btw = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      specialArgs = { inherit dotfiles dwm-src; };
+      specialArgs = { inherit dotfiles dwm-src st-src dmenu-src; };
       modules = [
         ./configuration.nix
         home-manager.nixosModules.home-manager

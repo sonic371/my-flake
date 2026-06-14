@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "dmenu-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1778175873,
+        "narHash": "sha256-RXmyTYkNt8MhQadG4AVidD88HDXmtwQeQV/KbGlttGg=",
+        "owner": "sonic371",
+        "repo": "dmenu",
+        "rev": "ccae9b52ec20bcb665bdaca53125bb137dcd07fa",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sonic371",
+        "repo": "dmenu",
+        "rev": "ccae9b52ec20bcb665bdaca53125bb137dcd07fa",
+        "type": "github"
+      }
+    },
     "dwm-src": {
       "flake": false,
       "locked": {
@@ -56,9 +73,28 @@
     },
     "root": {
       "inputs": {
+        "dmenu-src": "dmenu-src",
         "dwm-src": "dwm-src",
         "home-manager": "home-manager",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "st-src": "st-src"
+      }
+    },
+    "st-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1777615198,
+        "narHash": "sha256-pe26MrVb2mGvDzCU/GzY3SsxsMO8Qw0DBQox6RhR9qA=",
+        "owner": "sonic371",
+        "repo": "st-flexipatch",
+        "rev": "5396e957352d440e343b4e6433b40f1ed7a74b83",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sonic371",
+        "repo": "st-flexipatch",
+        "rev": "5396e957352d440e343b4e6433b40f1ed7a74b83",
+        "type": "github"
       }
     }
   },
