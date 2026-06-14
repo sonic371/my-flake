@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "dwm-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1781455374,
+        "narHash": "sha256-1IMBdKSJtQbBmZNym9ZYoaFUmJAGGYpe+BUxewWCVco=",
+        "owner": "sonic371",
+        "repo": "dwm",
+        "rev": "75bea1098a6492c88985d9343e3ef7aa48c1d687",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sonic371",
+        "ref": "mybuild",
+        "repo": "dwm",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -39,6 +56,7 @@
     },
     "root": {
       "inputs": {
+        "dwm-src": "dwm-src",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs"
       }

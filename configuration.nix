@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, dotfiles, dwm-src, ... }:
 
 {
   imports = [
@@ -42,6 +42,9 @@
         hash = "sha256-RXmyTYkNt8MhQadG4AVidD88HDXmtwQeQV/KbGlttGg=";
       };
     });
+    dwm = prev.dwm.overrideAttrs (old: {
+      src = dwm-src;
+    });
   }) ];
 
   environment.systemPackages = with pkgs; [
@@ -56,11 +59,6 @@
 
   # Custom fonts from dotfiles (with git LFS support)
   fonts.packages = with pkgs; let
-    dotfiles = builtins.fetchGit {
-      url = "https://github.com/sonic371/dotfiles.git";
-      rev = "88ae24141dfc0b8867c14d460a88627295278110";
-      lfs = true;
-    };
     fontDir = "${dotfiles}/fonts/.local/share/fonts";
   in [
     noto-fonts
@@ -75,11 +73,17 @@
     })
   ];
 
-  # Compatibility symlink for scripts using /bin/bash
-  system.activationScripts.binbash.text = ''
-    ln -sf ${pkgs.bash}/bin/bash /bin/bash
-  '';
+  # Better FHS compatibility
+  services.envfs.enable = true;
+
+  # Sound
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+  };
 
   system.stateVersion = "25.11";
 }
-

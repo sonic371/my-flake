@@ -1,17 +1,13 @@
-{ config, pkgs, ... }:
+{ config, pkgs, dotfiles, ... }:
 
-let
-  dotfiles = builtins.fetchGit {
-    url = "https://github.com/sonic371/dotfiles.git";
-    rev = "88ae24141dfc0b8867c14d460a88627295278110";
-    lfs = true;
-  };
-in {
+{
   home.stateVersion = "25.11";
 
   home.packages = with pkgs; [
     htop curl bat
     fastfetch
+    mpv
+    libnotify
     xorg.xrdb
     dunst
     feh
@@ -71,6 +67,27 @@ in {
     ".config/scripts/dmenu_media.sh".source = "${dotfiles}/scripts/.config/scripts/dmenu_media.sh";
     ".config/scripts/record-webcam.sh".source = "${dotfiles}/scripts/.config/scripts/record-webcam.sh";
     ".config/sxhkd/sxhkdrc".source = "${dotfiles}/sxhkd/.config/sxhkd/sxhkdrc";
+    ".config/dunst/dunstrc".source = "${dotfiles}/dunst/.config/dunst/dunstrc";
+    ".config/dunst/scripts/battery-alert.sh" = {
+      source = "${dotfiles}/dunst/.config/dunst/scripts/battery-alert.sh";
+      executable = true;
+    };
+  };
+
+  systemd.user.services.dunst = {
+    Unit = {
+      Description = "Dunst notification daemon";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "simple";
+      ExecStart = "${pkgs.dunst}/bin/dunst -config %h/.config/dunst/dunstrc";
+      Restart = "on-failure";
+    };
+    Install = {
+      WantedBy = [ "graphical-session.target" ];
+    };
   };
 
   systemd.user.services.picom = {
@@ -116,7 +133,7 @@ in {
     Service = {
       Type = "oneshot";
       Environment = [ "DISPLAY=:0" "PATH=${pkgs.dunst}/bin:${pkgs.coreutils}/bin:${pkgs.bash}/bin" ];
-      ExecStart = "${dotfiles}/dunst/.config/dunst/scripts/battery-alert.sh";
+      ExecStart = "%h/.config/dunst/scripts/battery-alert.sh";
     };
     Install = {
       WantedBy = [ "default.target" ];
