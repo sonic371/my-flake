@@ -25,7 +25,7 @@
     let
       dotfiles = builtins.fetchGit {
         url = "https://github.com/sonic371/dotfiles.git";
-        rev = "88ae24141dfc0b8867c14d460a88627295278110";
+        rev = "a2b9ed726688531170a378d3d16f4f77b8ef6f8e";
         lfs = true;
       };
     in {

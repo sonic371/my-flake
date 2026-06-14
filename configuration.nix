@@ -50,12 +50,9 @@
   environment.systemPackages = with pkgs; [
     vim
     wget
-    xclip
     st
     dmenu
   ];
-
-  environment.variables.EDITOR = "vim";
 
   # Custom fonts from dotfiles (with git LFS support)
   fonts.packages = with pkgs; let

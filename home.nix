@@ -4,18 +4,21 @@
   home.stateVersion = "25.11";
 
   home.packages = with pkgs; [
-    htop curl bat
+    htop curl
     fastfetch
     mpv
     libnotify
+    jq
+    ncdu
+    xclip
     xorg.xrdb
-    dunst
     feh
-    picom
     xdotool
     playerctl
     maim
     pulsemixer
+    dunst
+    picom
     sxhkd
   ];
 
@@ -32,9 +35,37 @@
   programs.bash = {
     enable = true;
     initExtra = ''
+      if [ -f "${dotfiles}/bashrc/.bashrc" ]; then
+        source "${dotfiles}/bashrc/.bashrc"
+      fi
       alias update='sudo nixos-rebuild switch --flake /etc/nixos#nixos-btw'
     '';
   };
+
+  programs.zoxide.enable = true;
+  programs.fzf = {
+    enable = true;
+    fileWidgetOptions = [
+      "--preview 'bat --style=numbers --color=always --line-range :500 {}'"
+      "--bind 'ctrl-/:toggle-preview'"
+    ];
+  };
+  programs.bat.enable = true;
+  programs.yazi.enable = true;
+  programs.eza = {
+    enable = true;
+    enableBashIntegration = true;
+    git = true;
+    icons = "auto";
+  };
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+  };
+  programs.ripgrep.enable = true;
+  programs.fd.enable = true;
 
   programs.starship = {
     enable = true;
@@ -71,6 +102,15 @@
     ".config/dunst/scripts/battery-alert.sh" = {
       source = "${dotfiles}/dunst/.config/dunst/scripts/battery-alert.sh";
       executable = true;
+    };
+    ".config/nvim/init.lua".source = "${dotfiles}/nvim/.config/nvim/init.lua";
+    ".config/nvim/lua" = {
+      source = "${dotfiles}/nvim/.config/nvim/lua";
+      recursive = true;
+    };
+    ".bash" = {
+      source = "${dotfiles}/bashrc/.bash";
+      recursive = true;
     };
   };
 
