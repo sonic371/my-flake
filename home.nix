@@ -47,7 +47,9 @@
   programs.zoxide.enable = true;
   programs.tmux = {
     enable = true;
-    extraConfig = builtins.readFile "${dotfiles}/tmux/.tmux.conf";
+    extraConfig = ''
+      set -g mode-keys vi
+    '' + builtins.readFile "${dotfiles}/tmux/.tmux.conf";
   };
 
   programs.fzf = {
