@@ -39,10 +39,17 @@
         source "${dotfiles}/bashrc/.bashrc"
       fi
       alias update='sudo nixos-rebuild switch --flake /etc/nixos#nixos-btw'
+      # npm global installs go to ~/.npm-global (no sudo needed)
+      export PATH="$HOME/.npm-global/bin:$PATH"
     '';
   };
 
   programs.zoxide.enable = true;
+  programs.tmux = {
+    enable = true;
+    extraConfig = builtins.readFile "${dotfiles}/tmux/.tmux.conf";
+  };
+
   programs.fzf = {
     enable = true;
     fileWidgetOptions = [
@@ -83,9 +90,25 @@
   };
 
   home.file = {
-    ".xinitrc".text = ''
-      [ -f "$HOME/.Xresources" ] && xrdb -merge "$HOME/.Xresources"
-      exec dwm
+    ".npmrc".text = ''
+      prefix=/home/wade/.npm-global
+    '';
+    ".config/fcitx5/profile".text = ''
+      [Groups/0]
+      Name=Default
+      Default Layout=us
+      DefaultIM=pinyin
+
+      [Groups/0/Items/0]
+      Name=keyboard-us
+      Layout=
+
+      [Groups/0/Items/1]
+      Name=pinyin
+      Layout=
+
+      [GroupOrder]
+      0=Default
     '';
     ".Xresources".source = "${dotfiles}/xresources/.Xresources";
     ".config/picom/picom.conf".source = "${dotfiles}/picom/.config/picom/picom.conf";
@@ -164,6 +187,29 @@
   };
 
   # User systemd services
+  systemd.user.services.fcitx5 = {
+    Unit = {
+      Description = "Fcitx5 input method editor";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      ExecStart = "${pkgs.qt6Packages.fcitx5-with-addons.override {
+        # Keep in sync with configuration.nix i18n.inputMethod.fcitx5.addons
+        addons = with pkgs; [
+          qt6Packages.fcitx5-chinese-addons
+          fcitx5-gtk
+          fcitx5-lua
+          fcitx5-nord
+        ];
+      }}/bin/fcitx5";
+      Restart = "on-failure";
+    };
+    Install = {
+      WantedBy = [ "graphical-session.target" ];
+    };
+  };
+
   systemd.user.services.battery-alert = {
     Unit = {
       Description = "Battery Alert Service";

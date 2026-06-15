@@ -19,6 +19,19 @@
     displayManager.sessionCommands = ''
       xset r rate 200 35 &
     '';
+    # Daemons (fcitx5, dunst, picom, sxhkd) started via home-manager systemd user services
+  };
+
+  # Input Method (fcitx5)
+  i18n.inputMethod = {
+    enable = true;
+    type = "fcitx5";
+    fcitx5.addons = with pkgs; [
+      qt6Packages.fcitx5-chinese-addons
+      fcitx5-gtk
+      fcitx5-lua
+      fcitx5-nord
+    ];
   };
 
   users.users.wade = {
@@ -52,6 +65,7 @@
     wget
     st
     dmenu
+    nodejs
   ];
 
   # Custom fonts from dotfiles (with git LFS support)
@@ -70,8 +84,9 @@
     })
   ];
 
-  # Better FHS compatibility
+  # Better FHS compatibility for non-Nix dynamic executables
   services.envfs.enable = true;
+  programs.nix-ld.enable = true;
 
   # Sound
   security.rtkit.enable = true;
