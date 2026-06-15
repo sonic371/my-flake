@@ -44,7 +44,7 @@
   nix.gc = {
     automatic = true;
     dates = "weekly";
-    options = "--delete-older-than 7d";
+    options = "--delete-old-generations 14";
   };
 
   nixpkgs.overlays = [ (final: prev: {
