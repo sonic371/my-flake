@@ -19,9 +19,10 @@
       url = "github:sonic371/dmenu/ccae9b52ec20bcb665bdaca53125bb137dcd07fa";
       flake = false;
     };
+    mcp-nixos.url = "github:utensils/mcp-nixos";
   };
 
-  outputs = { self, nixpkgs, home-manager, dwm-src, st-src, dmenu-src, ... }: 
+  outputs = { self, nixpkgs, home-manager, dwm-src, st-src, dmenu-src, mcp-nixos, ... }:
     let
       dotfiles = builtins.fetchGit {
         url = "https://github.com/sonic371/dotfiles.git";
@@ -29,6 +30,7 @@
         lfs = true;
       };
     in {
+    nixpkgs.overlays = [ mcp-nixos.overlays.default ];
     nixosConfigurations.nixos-btw = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = { inherit dotfiles dwm-src st-src dmenu-src; };

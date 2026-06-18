@@ -66,6 +66,7 @@
     st
     dmenu
     nodejs
+    uv
   ];
 
   # Custom fonts from dotfiles (with git LFS support)
